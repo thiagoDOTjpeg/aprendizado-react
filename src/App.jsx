@@ -1,67 +1,72 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 import "./styles/App.css";
 import { Navbar } from "./components/Navbar/Navbar";
 import { Article } from "./components/Article/Article";
-import { Counter } from "./components/Counter/counter";
 
-import ArticleImg1 from "./assets/imgs/article-img.jpg";
-import ArticleImg2 from "./assets/imgs/article-img-2.jpg";
-import ArticleImg3 from "./assets/imgs/article-img-3.jpg";
+import { ThreeDots } from "react-loader-spinner";
 
 // Componente em classe é uma classe que herda a calsse Componente do React,
 // e retorna HTML dentro do método render().
 
-class App extends React.Component {
+// Componente funcional é uma função que retorna um HTML
+
+export function App() {
+  const [news, setNews] = useState([]);
+
+  useEffect(() => {
+    async function loadNews() {
+      const response = await axios.get(
+        "https://api.spaceflightnewsapi.net/v4/articles/"
+      );
+      const newsData = response.data.results;
+
+      setNews(newsData);
+      console.log(newsData);
+    }
+
+    loadNews();
+  }, []);
+
   // Método responsável por renderizar o conteúdo HTML do nosso componentes
-  render() {
-    return (
-      <>
-        <Navbar />
+  return (
+    <>
+      {/* <Counter /> */}
+      <Navbar />
 
-        <Counter />
-
-        {/*  <section id="articles">
-          <Article
-            title="Designing Dashboards"
-            provider="NASA"
-            description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint rem
-            temporibus consequatur provident corrupti fugiat, incidunt illo.
-            Recusandae distinctio cumque quaerat, quasi labore fuga alias ullam,
-            provident, esse quibusdam sequi!"
-            image={ArticleImg1}
-          />
-          <Article
-            title="Vibrant Portraits of 2020"
-            provider="Space News"
-            description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint rem
-            temporibus consequatur provident corrupti fugiat, incidunt illo.
-            Recusandae distinctio cumque quaerat, quasi labore fuga alias ullam,
-            provident, esse quibusdam sequi!"
-            image={ArticleImg2}
-          />
-          <Article
-            title="36 Days of Malayalam Type"
-            provider="Space Flight Now"
-            description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint rem
-            temporibus consequatur provident corrupti fugiat, incidunt illo.
-            Recusandae distinctio cumque quaerat, quasi labore fuga alias ullam,
-            provident, esse quibusdam sequi!"
-            image={ArticleImg3}
-          />
-          <Article
-            title="Designing Dashboards"
-            provider="NASA"
-            description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint rem
-            temporibus consequatur provident corrupti fugiat, incidunt illo.
-            Recusandae distinctio cumque quaerat, quasi labore fuga alias ullam,
-            provident, esse quibusdam sequi!"
-            image={ArticleImg1}
-          />
-        </section> */}
-      </>
-    );
-  }
+      <section id="articles">
+        {news.length === 0 ? (
+          <div
+            style={{
+              height: "400px",
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignContent: "center",
+            }}
+          >
+            <ThreeDots
+              height="80"
+              width="80"
+              radius="9"
+              color="white"
+              ariaLabel="loading"
+            />
+          </div>
+        ) : (
+          news.map((article) => {
+            return (
+              <Article
+                title={article.title}
+                provider={article.news_site}
+                description={article.summary}
+                image={article.image_url}
+              />
+            );
+          })
+        )}
+      </section>
+    </>
+  );
 }
-
-export default App;
